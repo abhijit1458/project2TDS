@@ -4,7 +4,7 @@ from functionsGA3 import *
 from functionsGA4 import *
 from functionsGA5 import *
 
-from openai_embedd import find_embed
+from openai_embed import find_embed
 
 from pathlib import Path
 import shutil
