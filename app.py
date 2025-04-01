@@ -1,16 +1,8 @@
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, Form, UploadFile
 from typing import Optional
-from functionsGA1 import *
-from functionsGA2 import *
-from functionsGA3 import *
-from functionsGA4 import *
-from functionsGA5 import *
 
 from routes import *
-
-from fastapi import FastAPI, Form, UploadFile
-from fastapi.middleware.cors import CORSMiddleware
-
-
 
 app = FastAPI()
 

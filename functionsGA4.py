@@ -1,15 +1,15 @@
-from bs4 import BeautifulSoup
-import requests
-import json
-import re
-from urllib.parse import urlencode
-import pandas as pd
-from datetime import datetime
-from geopy.geocoders import Nominatim
 from xml.etree import ElementTree as ET
+from geopy.geocoders import Nominatim
+from urllib.parse import urlencode
+from bs4 import BeautifulSoup
+from datetime import datetime
+import pandas as pd
 import datetime
+import requests
+import tabula 
+import json
 import os
-import tabula
+import re
 
 # Your GitHub personal access token (Replace with a valid token)
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")
@@ -367,7 +367,10 @@ def extract_table_from_pdf(question_text, pdf_path):
     check_score = int(score_criteria.split()[0])
 
     # Extract tables from the PDF, specifying pages and multiple_tables=True
+    # tables = io.read_pdf(pdf_path, pages="all", multiple_tables=True)
+    # import tabula
     tables = tabula.read_pdf(pdf_path, pages="all", multiple_tables=True)
+
 
     # Initialize an empty list to store all DataFrames
     all_dfs = []

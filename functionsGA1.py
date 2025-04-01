@@ -1,3 +1,4 @@
+from bs4 import BeautifulSoup
 from io import BytesIO
 import pandas as pd
 import numpy as np
@@ -13,6 +14,7 @@ import os
 
 
 # ---------------------------------- GA 1.1 --------------------------------------- #
+
 def handle_VScode():
   output = r"""
 Version:          Code 1.98.2 (ddc367ed5c8936efe395cffeec279b04ffd7db78, 2025-03-12T13:32:45.399Z)
@@ -24,6 +26,7 @@ VM:               0%
   return output
 
 # ---------------------------------- GA 1.2 --------------------------------------- #
+
 def extract_question_GA12(question_text):
   # Extract URL using regex
   url_pattern = r"https://[^\s]+"
@@ -58,6 +61,7 @@ def get_json_output(question_text):
   return json.dumps(ans)
 
 # ---------------------------------- GA 1.3 --------------------------------------- #
+
 def run_npx_prettier(file_path):
     # Run the npx prettier command and get the sha256sum
     cmd = f"npx -y prettier@3.4.2 {file_path} | sha256sum"
@@ -67,6 +71,7 @@ def run_npx_prettier(file_path):
     return str(process.stdout.strip())
 
 # ---------------------------------- GA 1.4 --------------------------------------- #
+
 def extract_ques_GA14(question_text):
   # Extract formula using regex
   formula_pattern = r"=(?:[A-Z]+\([^\n]+\))"
@@ -113,6 +118,7 @@ def parse_formula_GA14(question_text: str):
     return str(result)
 
 # ---------------------------------- GA 1.5 --------------------------------------- #
+
 def extract_ques_GA15(question_text):
   formula_pattern = r"=SUM\(.*\))"
 
@@ -156,9 +162,19 @@ def parse_formula_GA15(question_text: str):
 
 # ---------------------------------- GA 1.6 --------------------------------------- #
 
-# ------------------------------------NOT DONE------------------------------------- #
+def find_hidden_value(file_bytes):
+    html_content = file_bytes.decode("utf-8") 
+
+    soup = BeautifulSoup(html_content, "html.parser")
+
+    # Extract the hidden input value
+    hidden_input = soup.find("input", type="hidden")
+    hidden_value = hidden_input["value"] if hidden_input else None
+
+    return str(hidden_value)
 
 # ---------------------------------- GA 1.7 --------------------------------------- #
+
 def extract_ques_GA17(question_text):
   # Given text
   if question_text == "":
@@ -199,6 +215,7 @@ def count_days(question_text):
     return str(day_count)
 
 # ---------------------------------- GA 1.8 --------------------------------------- #
+
 def extract_ques_GA18(question):
     column_match = re.search(r"value in the ['\"]?([\w]+)['\"]? column", question)
 
@@ -226,6 +243,7 @@ def find_csv_val(question_text, file_bytes):
         return None
 
 # ---------------------------------- GA 1.9 --------------------------------------- #
+
 def extract_ques_GA19(text):
   # Extract the first and second field names (keys in JSON)
   field_pattern = r'"(\w+)"\s*:\s*'
@@ -237,7 +255,6 @@ def extract_ques_GA19(text):
   json_match = re.search(json_pattern, text, re.DOTALL).group(1)
 
   return json_match, first_field, sec_field
-
 
 def sort_json_data(question_text):
     json_str, first_field, second_field = extract_ques_GA19(question_text)
@@ -252,6 +269,7 @@ def sort_json_data(question_text):
     return json.dumps(sorted_data, separators=(',', ':'))
 
 # ---------------------------------- GA 1.10 -------------------------------------- #
+
 def hash_sha256(text: str) -> str:
     encoded_text = text.encode("utf-8")  # Ensure UTF-8 encoding
     return hashlib.sha256(encoded_text).hexdigest()
@@ -270,9 +288,42 @@ def hash_file_sha256(file_bytes) -> str:
 
 # ---------------------------------- GA 1.11 -------------------------------------- #
 
-# ---------------------------------- NOT DONE ------------------------------------- #
+def extract_html_elements(question_text):
+    # Regular expression patterns
+    tag_pattern = r"Find all <(\w+)>"
+    class_pattern = r'having a (\w+) class'
+    attribute_pattern = r'(\w+-\w+) attributes?'
+
+    # Extract tag name
+    tag_match = re.search(tag_pattern, question_text)
+    tag_name = tag_match.group(1) if tag_match else None
+
+    # Extract class name
+    class_match = re.search(class_pattern, question_text)
+    class_name = class_match.group(1) if class_match else None
+
+    # Extract attribute name
+    attribute_match = re.search(attribute_pattern, question_text)
+    attribute_name = attribute_match.group(1) if attribute_match else None
+
+    return tag_name, class_name, attribute_name
+
+def find_total_tag(ques_text, file_bytes):
+    tag_name, class_name, attribute_name = extract_html_elements(ques_text)
+    html_content = file_bytes.decode("utf-8") 
+
+    soup = BeautifulSoup(html_content, "html.parser")
+
+    # Find all <div> elements with class "foo"
+    foo_divs = soup.find_all(tag_name, class_=class_name)
+
+    # Extract and sum their "data-value" attributes (if present)
+    total_value = sum(int(div[attribute_name]) for div in foo_divs if div.has_attr("data-value"))
+
+    return str(total_value)
 
 # ----------------------------------- GA 1.12 ------------------------------------- #
+
 def extract_ques_GA112(text):
     # Extract the required symbols from the text
     match = re.search(r"([^\w\s]+(?:\s+OR\s+[^\w\s]+)+)", text).group(1)
@@ -301,6 +352,7 @@ def extract_symbol_count(question_text, zip_file_path):
 # ---------------------------------- GA 1.13 -------------------------------------- #
 # ---------------------------------- NOT DONE ------------------------------------- #
 # ---------------------------------- GA 1.14 -------------------------------------- #
+
 def extract_ques_GA114(text):
   # Extract words to be replaced
   match = re.search(r'"(\w+)" \(.*?\) with "([^"]+)"', text)
@@ -361,6 +413,7 @@ def replace_word_and_extract_hash(ques_text, zip_path):
     return str(computed_hash)
 
 # ---------------------------------- GA 1.15 -------------------------------------- #
+
 def extract_ques_GA115(text):
   # Extract minimum file size
   size_match = re.search(r"at least (\d+) bytes", text)
@@ -413,6 +466,7 @@ def get_matching_files_size(question_text, file_path):
     return str(total_size)
 
 # ---------------------------------- GA 1.16 -------------------------------------- #
+
 def extract_zip_GA116(zip_path, extract_to):
     """Extract the ZIP file while preserving timestamps."""
     os.makedirs(extract_to, exist_ok=True)
@@ -466,6 +520,7 @@ def get_rename_hash(ZIP_FILE):
     return str(sha256_hash)
 
 # ---------------------------------- GA 1.17 -------------------------------------- #
+
 def extract_ques_GA117(text):
   # Regex to extract filenames (ending with .txt)
   filenames = re.findall(r"\b\w+\.txt\b", text)
@@ -533,4 +588,4 @@ def gen_sql_query(question_text):
     # Generate SQL query
     return f"SELECT SUM(units * price) FROM {table_name} WHERE LOWER(TRIM(type)) = '{search_item}';"
 
-# ---------------------------------- END -------------------------------------- #
+# ------------------------------------ END ---------------------------------------- #

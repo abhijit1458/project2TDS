@@ -1,3 +1,9 @@
+from sklearn.metrics.pairwise import cosine_similarity
+from pathlib import Path
+import shutil
+import numpy as np
+import json
+
 from functionsGA1 import *
 from functionsGA2 import *
 from functionsGA3 import *
@@ -6,15 +12,8 @@ from functionsGA5 import *
 
 from openai_embed import find_embed
 
-from pathlib import Path
-import shutil
-from sklearn.metrics.pairwise import cosine_similarity
-import numpy as np
-import json
-
 with open("All_Ques_Embedded.json", "r") as f:
     file_data = json.load(f)
-
 
 embedd = [json.loads(key) for entry in file_data for key in entry.keys()]  # Ensure correct loading
 
@@ -76,8 +75,9 @@ async def get_solution(q_id, ques, file):
         return parse_formula_GA14(ques)
     elif q_id == "GA_1_5":
         return parse_formula_GA15(ques)
-    # elif q_id == "GA_1_6":
-    #     return parse_formula_GA16(ques)
+    elif q_id == "GA_1_6":
+        file_bytes = await file.read()
+        return find_hidden_value(file_bytes)
     elif q_id == "GA_1_7":
         return count_days(ques)
     elif q_id == "GA_1_8":
@@ -88,8 +88,9 @@ async def get_solution(q_id, ques, file):
     elif q_id == "GA_1_10":
         file_bytes = await file.read()
         return hash_file_sha256(file_bytes)
-    # elif q_id == "GA_1_11":
-        # return extract_json(ques)
+    elif q_id == "GA_1_11":
+        file_bytes = await file.read()
+        return find_total_tag(ques, file_bytes)
     elif q_id == "GA_1_12":
         file_path = save_file(file)
         return extract_symbol_count(ques, file_path)

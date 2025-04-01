@@ -19,8 +19,5 @@ def find_embed(ques):
 
     response = requests.post(url, headers=headers, data=json.dumps(data))
     
-    # Debug: Print response data to check if API is returning fresh results
-    # print(response.json())
-
     return response.json()['data'][0]['embedding']
 
